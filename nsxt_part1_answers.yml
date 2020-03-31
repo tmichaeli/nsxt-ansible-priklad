@@ -1,0 +1,22 @@
+---
+nsxt_ip_sets:
+- display_name: google_dns
+  ip_addresses:
+  - '8.8.8.8'
+  - '8.8.4.4'
+  state: present
+nsxt_firewall_section:
+- display_name: Default rules
+  stateful: True
+  state: present
+  rules:
+  - display_name: Google DNS
+    action: ALLOW
+    destinations: 
+    - target_display_name: google_dns
+      target_type: IPSet
+    ip_protocol: IPV4
+    resource_type: FirewallRule
+    services: 
+    - target_display_name: DNS
+      target_type: NSService

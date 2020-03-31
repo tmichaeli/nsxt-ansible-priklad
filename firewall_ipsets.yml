@@ -1,0 +1,27 @@
+---
+  - hosts: 127.0.0.1
+    connection: local
+    tasks:  
+      - name: Create a new IP Set
+        nsxt_ip_sets:
+          hostname: "{{ hostname }}"
+          username: "{{ username }}"
+          password: "{{ password }}"
+          validate_certs: "{{ validate_certs }}"
+          display_name: "{{ item.display_name }}"
+          ip_addresses: "{{ item.ip_addresses }}"
+          state: "{{ item.tags | default('present') }}"
+        with_items:
+          - "{{ nsxt_ip_sets }}"
+      - name: Create DFW Section with Rules
+        nsxt_firewall_section_with_rules:
+          hostname: "{{ hostname }}"
+          username: "{{ username }}"
+          password: "{{ password }}"
+          validate_certs: "{{ validate_certs }}"      
+          display_name: "{{ item.display_name }}"
+          rules: "{{ item.rules | default([]) }}"
+          state: "{{ item.tags | default('present') }}"
+          stateful: "{{ item.stateful | default(True) }}"
+        with_items:
+          - "{{ nsxt_firewall_section }}"

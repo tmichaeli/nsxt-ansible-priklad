@@ -1,0 +1,59 @@
+---
+    nsxt_services:
+    - display_name: HTTPS-Alt
+      nsservice_element:
+        destination_ports:
+        - 8443
+        l4_protocol: TCP
+        resource_type: L4PortSetNSService
+      state: present
+    nsxt_ip_sets:
+    - display_name: dummy_canonical_repo
+      ip_addresses:
+      - '10.1.2.3'
+      state: present
+    - display_name: dummy_ansible_repo
+      ip_addresses:
+      - '10.1.2.4'
+      state: present
+    nsxt_ns_groups:
+    - display_name: repos_for_ubuntu
+      members:
+      - resource_type: NSGroupSimpleExpression
+        target_property: id
+        op: EQUALS
+        target_type: IPSet
+        value: dummy_canonical_repo
+      - resource_type: NSGroupSimpleExpression
+        target_property: id
+        op: EQUALS
+        target_type: IPSet
+        value: dummy_ansible_repo
+      state: present
+    - display_name: ubuntu_vms
+      membership_criteria:
+        - resource_type: NSGroupSimpleExpression
+          target_type: VirtualMachine
+          target_property: os_name
+          op: CONTAINS
+          value: Other 3.x Linux
+      state: present
+    nsxt_firewall_section:
+    - display_name: Ubuntu default rules
+      description: Testing edge1
+      stateful: True
+      state: present
+      rules:
+      - display_name: Repo Access
+        action: ALLOW
+        destinations: 
+        - target_display_name: repos_for_ubuntu
+          target_type: NSGroup
+        ip_protocol: IPV4
+        resource_type: FirewallRule
+        services: 
+        - target_display_name: HTTPS-Alt
+          target_type: NSService
+        sources: 
+        - target_display_name: ubuntu_vms
+          target_type: NSGroup

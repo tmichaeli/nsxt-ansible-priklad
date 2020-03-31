@@ -1,0 +1,5 @@
+---
+    hostname: 192.168.0.138
+    username: admin
+    password: VMware1!VMware1!
+    validate_certs: False
